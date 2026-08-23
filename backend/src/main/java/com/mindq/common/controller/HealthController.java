@@ -38,7 +38,9 @@ public class HealthController {
         checks.put("users", Map.of("status", "UP", "count", userRepository.count()));
         result.put("checks", checks);
 
-        boolean allUp = checks.values().stream()
+        boolean allUp = checks.entrySet().stream()
+                .filter(e -> !"ai".equals(e.getKey()))
+                .map(Map.Entry::getValue)
                 .allMatch(c -> c instanceof Map m && "UP".equals(m.get("status")));
         if (!allUp) {
             result.put("status", "DEGRADED");

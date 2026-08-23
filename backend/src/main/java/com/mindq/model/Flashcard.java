@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "flashcards", indexes = {
-    @Index(name = "idx_flashcards_user", columnList = "user_id"),
     @Index(name = "idx_flashcards_set", columnList = "flashcard_set_id")
 })
 @Getter
