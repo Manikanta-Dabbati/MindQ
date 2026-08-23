@@ -43,7 +43,8 @@ jobs:
           cache: 'maven'
       
       - name: Run tests
-        run: mvn test -pl . --no-transfer-progress
+        run: mvn test --no-transfer-progress
+        working-directory: backend
         env:
           DB_HOST: localhost
           DB_PORT: 3306
@@ -54,7 +55,8 @@ jobs:
           SHOW_SQL: 'false'
       
       - name: Build JAR
-        run: mvn package -DskipTests -pl . --no-transfer-progress
+        run: mvn package -DskipTests --no-transfer-progress
+        working-directory: backend
       
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
