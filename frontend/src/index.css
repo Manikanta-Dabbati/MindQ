@@ -1,0 +1,333 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ============================================
+   MINDQ DESIGN TOKENS — LIGHT THEME
+   ============================================ */
+
+:root {
+  /* Brand Colors */
+  --mq-primary: #2563EB;
+  --mq-primary-hover: #1D4ED8;
+  --mq-primary-light: #EFF6FF;
+  --mq-primary-border: #BFDBFE;
+
+  --mq-ai: #7C3AED;
+  --mq-ai-hover: #6D28D9;
+  --mq-ai-light: #F5F3FF;
+  --mq-ai-border: #DDD6FE;
+
+  /* Background & Surface */
+  --mq-bg: #F8FAFC;
+  --mq-surface: #FFFFFF;
+  --mq-surface-hover: #F1F5F9;
+
+  /* Text */
+  --mq-text: #0F172A;
+  --mq-text-secondary: #64748B;
+  --mq-text-muted: #94A3B8;
+
+  /* Borders */
+  --mq-border: #E2E8F0;
+  --mq-border-light: #F1F5F9;
+
+  /* Semantic Colors */
+  --mq-success: #16A34A;
+  --mq-success-light: #F0FDF4;
+  --mq-success-border: #BBF7D0;
+
+  --mq-warning: #D97706;
+  --mq-warning-light: #FFF7ED;
+  --mq-warning-border: #FED7AA;
+
+  --mq-error: #DC2626;
+  --mq-error-light: #FEF2F2;
+  --mq-error-border: #FECACA;
+
+  /* Typography */
+  --mq-font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Spacing */
+  --mq-radius-sm: 8px;
+  --mq-radius-md: 12px;
+  --mq-radius-lg: 16px;
+  --mq-radius-xl: 20px;
+
+  /* Shadows */
+  --mq-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04);
+  --mq-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --mq-shadow-lg: 0 8px 30px rgba(15, 23, 42, 0.08);
+
+  /* Transitions */
+  --mq-transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Font */
+  font-family: var(--mq-font);
+  color: var(--mq-text);
+  background: var(--mq-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+
+.dark {
+  /* Brand Colors — slightly brighter for dark backgrounds */
+  --mq-primary: #3B82F6;
+  --mq-primary-hover: #60A5FA;
+  --mq-primary-light: rgba(59, 130, 246, 0.15);
+  --mq-primary-border: rgba(59, 130, 246, 0.3);
+
+  --mq-ai: #8B5CF6;
+  --mq-ai-hover: #A78BFA;
+  --mq-ai-light: rgba(139, 92, 246, 0.15);
+  --mq-ai-border: rgba(139, 92, 246, 0.3);
+
+  /* Background & Surface */
+  --mq-bg: #0B1120;
+  --mq-surface: #111827;
+  --mq-surface-hover: #1E293B;
+
+  /* Text */
+  --mq-text: #F8FAFC;
+  --mq-text-secondary: #94A3B8;
+  --mq-text-muted: #64748B;
+
+  /* Borders */
+  --mq-border: #1E293B;
+  --mq-border-light: #1E293B;
+
+  /* Semantic Colors — adjusted for dark backgrounds */
+  --mq-success: #22C55E;
+  --mq-success-light: rgba(34, 197, 94, 0.12);
+  --mq-success-border: rgba(34, 197, 94, 0.25);
+
+  --mq-warning: #F59E0B;
+  --mq-warning-light: rgba(245, 158, 11, 0.12);
+  --mq-warning-border: rgba(245, 158, 11, 0.25);
+
+  --mq-error: #EF4444;
+  --mq-error-light: rgba(239, 68, 68, 0.12);
+  --mq-error-border: rgba(239, 68, 68, 0.25);
+
+  /* Shadows — darker for dark mode */
+  --mq-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --mq-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --mq-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+
+  /* Override body defaults */
+  color: var(--mq-text);
+  background: var(--mq-bg);
+}
+
+/* ============================================
+   BASE RESETS
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-width: 320px;
+  background: var(--mq-bg);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--mq-primary-light);
+  color: var(--mq-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mq-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mq-text-muted);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mq-text-secondary);
+}
+
+/* ============================================
+   SKELETON ANIMATION
+   ============================================ */
+
+@keyframes mq-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.mq-skeleton {
+  background: linear-gradient(90deg, var(--mq-border) 25%, var(--mq-surface) 50%, var(--mq-border) 75%);
+  background-size: 200% 100%;
+  animation: mq-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--mq-radius-sm);
+}
+
+.dark .mq-skeleton {
+  background: linear-gradient(90deg, var(--mq-surface-hover) 25%, var(--mq-surface) 50%, var(--mq-surface-hover) 75%);
+  background-size: 200% 100%;
+}
+
+/* ============================================
+   TOAST ANIMATION
+   ============================================ */
+
+@keyframes mq-toast-in {
+  0% { transform: translateY(-100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes mq-toast-out {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-100%); opacity: 0; }
+}
+
+.mq-toast-enter {
+  animation: mq-toast-in 0.3s ease-out;
+}
+
+.mq-toast-exit {
+  animation: mq-toast-out 0.2s ease-in forwards;
+}
+
+/* ============================================
+   PAGE TRANSITION
+   ============================================ */
+
+@keyframes mq-page-in {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.mq-page-enter {
+  animation: mq-page-in 0.3s ease-out;
+}
+
+/* ============================================
+   BUTTON MICRO-INTERACTIONS
+   ============================================ */
+
+button.mq-btn-primary {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button.mq-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+button.mq-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+button.mq-btn-secondary {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button.mq-btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--mq-shadow-md);
+}
+
+.mq-icon-btn {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mq-icon-btn:hover {
+  transform: scale(1.05);
+}
+
+.mq-icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   CARD HOVER POLISH
+   ============================================ */
+
+.mq-card {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mq-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mq-shadow-lg);
+}
+
+.mq-card:active {
+  transform: translateY(0);
+  box-shadow: var(--mq-shadow-sm);
+}
+
+/* ============================================
+   FOCUS VISIBLE
+   ============================================ */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--mq-primary);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ============================================
+   SCREEN READER ONLY
+   ============================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only.focus:not(:focus-visible) {
+  /* Keep hidden unless focused via keyboard */
+}

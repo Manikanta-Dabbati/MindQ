@@ -1,0 +1,36 @@
+# Production profile
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
+
+server:
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/css,application/javascript
+  # Trust proxy headers for rate limiting behind load balancer/reverse proxy
+  forward-headers-strategy: native
+
+app:
+  jwt:
+    # CRITICAL: JWT_SECRET must be set in production. App fails to start if missing.
+    secret: ${JWT_SECRET}
+    expiration-ms: 3600000
+    refresh-expiration-ms: 604800000
+  cors:
+    # CRITICAL: CORS_ALLOWED_ORIGINS must be set to your production frontend URL
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+
+# Disable Swagger/OpenAPI in production
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

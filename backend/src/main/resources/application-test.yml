@@ -1,0 +1,12 @@
+app:
+  otp:
+    enabled: false
+  mail:
+    enabled: false
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    enabled: false
