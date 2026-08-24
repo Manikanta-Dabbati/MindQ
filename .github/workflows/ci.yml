@@ -121,20 +121,30 @@ jobs:
       - name: Test docker-compose up
         run: |
           export JWT_SECRET=ci-test-secret-for-docker-compose-min-32ch
-          docker compose up -d
 
-          # Wait for all services to become healthy (max 120s)
-          TIMEOUT=120
+          # Always clean up containers on exit (success or failure)
+          cleanup() {
+            echo "--- Cleanup: stopping containers ---"
+            docker compose logs --tail=30 backend 2>/dev/null || true
+            docker compose down -v --remove-orphans 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          # Build and start all services
+          docker compose up -d --build
+
+          # Wait for all services to become healthy (max 180s)
+          TIMEOUT=180
           ELAPSED=0
-          SERVICES="mindq-mysql mindq-backend mindq-frontend"
           echo "Waiting for services to become healthy (timeout: ${TIMEOUT}s)..."
           while [ $ELAPSED -lt $TIMEOUT ]; do
             ALL_HEALTHY=true
             ANY_UNHEALTHY=false
 
-            for SVC in $SERVICES; do
+            for SVC in mindq-mysql mindq-backend mindq-frontend; do
               STATUS=$(docker inspect --format="{{.State.Health.Status}}" "$SVC" 2>/dev/null || echo "missing")
               if [ "$STATUS" = "unhealthy" ]; then
+                echo "ERROR: $SVC is unhealthy"
                 ANY_UNHEALTHY=true
                 break
               fi
@@ -144,11 +154,7 @@ jobs:
             done
 
             if [ "$ANY_UNHEALTHY" = true ]; then
-              echo "ERROR: A service is unhealthy after ${ELAPSED}s"
               docker compose ps
-              docker compose logs --tail=50 backend
-              docker compose logs --tail=50 mysql
-              docker compose down
               exit 1
             fi
 
@@ -164,16 +170,18 @@ jobs:
           done
 
           if [ $ELAPSED -ge $TIMEOUT ]; then
-            echo "ERROR: Timed out after ${TIMEOUT}s waiting for services"
+            echo "ERROR: Timed out after ${TIMEOUT}s"
             docker compose ps
-            docker compose logs --tail=50 backend
-            docker compose logs --tail=50 mysql
-            docker compose down
+            docker compose logs --tail=30 backend
+            docker compose logs --tail=30 mysql
             exit 1
           fi
 
           # Verify endpoints respond
+          echo "Checking backend health..."
           curl -f http://localhost:8080/api/v1/health
+          echo ""
+          echo "Checking frontend..."
           curl -f http://localhost:80
-
-          docker compose down
+          echo ""
+          echo "All checks passed!"
