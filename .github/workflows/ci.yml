@@ -120,6 +120,7 @@ jobs:
       
       - name: Test docker-compose up
         run: |
+          export JWT_SECRET=ci-test-secret-for-docker-compose-min-32ch
           docker compose up -d
 
           # Wait for all services to become healthy (max 120s)
