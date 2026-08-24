@@ -36,6 +36,21 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
 
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   servlet:
     multipart:
       max-file-size: 10MB
@@ -69,10 +84,9 @@ app:
       max-tokens: ${GROQ_MAX_TOKENS:4096}
       temperature: ${GROQ_TEMPERATURE:0.7}
       max-material-chars: 80000
-  elastic-email:
-    api-key: ${ELASTIC_EMAIL_API_KEY:}
-    sender: ${ELASTIC_EMAIL_SENDER:}
-    sender-name: ${ELASTIC_EMAIL_SENDER_NAME:MindQ}
+  mail:
+    from: ${MAIL_FROM:}
+    from-name: ${MAIL_FROM_NAME:MindQ}
   otp:
     enabled: ${OTP_ENABLED:false}
   payment:

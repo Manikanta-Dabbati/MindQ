@@ -2,6 +2,7 @@ package com.mindq.security;
 
 import com.mindq.auth.service.OtpService;
 import com.mindq.auth.service.TokenService;
+import com.mindq.repository.EmailLogRepository;
 import com.mindq.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class TokenCleanupScheduler {
     private final TokenService tokenService;
     private final OtpService otpService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final EmailLogRepository emailLogRepository;
 
     /**
      * Clean up expired refresh tokens every hour.
@@ -56,6 +58,21 @@ public class TokenCleanupScheduler {
             log.debug("Cleaned up expired OTPs");
         } catch (Exception e) {
             log.error("Failed to clean up expired OTPs", e);
+        }
+    }
+
+    /**
+     * Clean up email logs older than 30 days every 6 hours.
+     */
+    @Scheduled(fixedRate = 21600000, initialDelay = 21600000)
+    public void cleanupOldEmailLogs() {
+        try {
+            int deleted = emailLogRepository.deleteOlderThan(LocalDateTime.now().minusDays(30));
+            if (deleted > 0) {
+                log.info("Cleaned up {} old email logs", deleted);
+            }
+        } catch (Exception e) {
+            log.error("Failed to clean up old email logs", e);
         }
     }
 }

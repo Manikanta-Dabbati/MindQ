@@ -55,6 +55,17 @@ services:
     networks:
       - mindq-network
 
+  # MailDev - Local email testing UI
+  maildev:
+    image: maildev/maildev
+    container_name: mindq-maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080"   # Web UI: http://localhost:1080
+      - "1025:1025"   # SMTP: localhost:1025
+    networks:
+      - mindq-network
+
   # React Frontend (nginx)
   frontend:
     build:
