@@ -17,34 +17,34 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Email service using Brevo's transactional email HTTPS API.
+ * Email service using Elastic Email's transactional email HTTPS API.
  *
  * Environment variables:
  *   BREVO_API_KEY       - Brevo API key
- *   BREVO_SENDER_EMAIL  - Verified sender email address
- *   BREVO_SENDER_NAME   - Sender display name (default: MindQ)
+ *   ELASTIC_EMAIL_SENDER  - Sender email address
+ *   ELASTIC_EMAIL_SENDER_NAME - Sender display name (default: MindQ)
  *
  * NEVER log API keys or OTP values.
  */
 @Slf4j
 @Service
 @Profile("!test")
-public class BrevoEmailService implements EmailService {
+public class ElasticEmailService implements EmailService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
-    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+    private static final String API_URL = "https://api.elasticemail.com/v4/emails/transactional";
 
     private final String apiKey;
     private final String senderEmail;
     private final String senderName;
 
-    public BrevoEmailService(
-            @Value("${app.brevo.api-key:}") String apiKey,
-            @Value("${app.brevo.sender-email:noreply@mindq.app}") String senderEmail,
-            @Value("${app.brevo.sender-name:MindQ}") String senderName) {
+    public ElasticEmailService(
+            @Value("${app.elastic-email.api-key:}") String apiKey,
+            @Value("${app.elastic-email.sender:}") String senderEmail,
+            @Value("${app.elastic-email.sender-name:MindQ}") String senderName) {
         this.apiKey = apiKey;
         this.senderEmail = senderEmail;
         this.senderName = senderName;
@@ -56,7 +56,7 @@ public class BrevoEmailService implements EmailService {
         String subject = "MindQ — Your verification code";
         String htmlBody = buildOtpEmailHtml(otpCode, purpose);
         sendHtmlEmail(to, subject, htmlBody);
-        log.info("OTP email sent via Brevo to {} (purpose={})", to, purpose);
+        log.info("OTP email sent via Elastic Email to {} (purpose={})", to, purpose);
     }
 
     @Async
@@ -65,7 +65,7 @@ public class BrevoEmailService implements EmailService {
         String subject = "MindQ — Reset your password";
         String htmlBody = buildPasswordResetHtml(link);
         sendHtmlEmail(to, subject, htmlBody);
-        log.info("Password reset email sent via Brevo to {}", to);
+        log.info("Password reset email sent via Elastic Email to {}", to);
     }
 
     private void sendHtmlEmail(String to, String subject, String htmlBody) {
@@ -80,9 +80,9 @@ public class BrevoEmailService implements EmailService {
             String jsonBody = MAPPER.writeValueAsString(body);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BREVO_API_URL))
+                    .uri(URI.create(API_URL))
                     .header("accept", "application/json")
-                    .header("api-key", apiKey)
+                    .header("x-elasticemail-apikey", apiKey)
                     .header("content-type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .timeout(Duration.ofSeconds(15))
@@ -90,19 +90,19 @@ public class BrevoEmailService implements EmailService {
 
             HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() == 201) {
+            if (response.statusCode() == 200) {
                 JsonNode json = MAPPER.readTree(response.body());
-                String messageId = json.path("messageId").asText("unknown");
-                log.info("Brevo email sent successfully - messageId={}", messageId);
+                String messageId = json.path("MessageID").asText("unknown");
+                log.info("Elastic Email sent successfully - messageId={}", messageId);
             } else {
-                log.error("Brevo API error: HTTP {} - {}", response.statusCode(), response.body());
+                log.error("Elastic Email API error: HTTP {} - {}", response.statusCode(), response.body());
                 throw new RuntimeException("Failed to send email. Please try again later.");
             }
 
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Failed to send email via Brevo to {}: {}", to, e.getMessage());
+            log.error("Failed to send email via Elastic Email to {}: {}", to, e.getMessage());
             throw new RuntimeException("Failed to send email. Please try again later.", e);
         }
     }

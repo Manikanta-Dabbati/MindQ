@@ -69,10 +69,10 @@ app:
       max-tokens: ${GROQ_MAX_TOKENS:4096}
       temperature: ${GROQ_TEMPERATURE:0.7}
       max-material-chars: 80000
-  brevo:
-    api-key: ${BREVO_API_KEY:}
-    sender-email: ${BREVO_SENDER_EMAIL:noreply@mindq.app}
-    sender-name: ${BREVO_SENDER_NAME:MindQ}
+  elastic-email:
+    api-key: ${ELASTIC_EMAIL_API_KEY:}
+    sender: ${ELASTIC_EMAIL_SENDER:}
+    sender-name: ${ELASTIC_EMAIL_SENDER_NAME:MindQ}
   otp:
     enabled: ${OTP_ENABLED:false}
   payment:
