@@ -71,18 +71,20 @@ public class ElasticEmailService implements EmailService {
     private void sendHtmlEmail(String to, String subject, String htmlBody) {
         try {
             Map<String, Object> body = Map.of(
-                "sender", Map.of("name", senderName, "email", senderEmail),
-                "to", List.of(Map.of("email", to)),
-                "subject", subject,
-                "htmlContent", htmlBody
+                "Recipients", Map.of("To", List.of(to)),
+                "Content", Map.of(
+                    "From", senderEmail,
+                    "FromName", senderName,
+                    "Subject", subject,
+                    "Body", List.of(Map.of("ContentType", "HTML", "Content", htmlBody))
+                )
             );
 
             String jsonBody = MAPPER.writeValueAsString(body);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL))
-                    .header("accept", "application/json")
-                    .header("x-elasticemail-apikey", apiKey)
+                                        .header("x-elasticemail-apikey", apiKey)
                     .header("content-type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .timeout(Duration.ofSeconds(15))
