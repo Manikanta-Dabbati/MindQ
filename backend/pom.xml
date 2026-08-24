@@ -79,6 +79,12 @@
             <artifactId>flyway-mysql</artifactId>
         </dependency>
 
+        <!-- Spring Boot Flyway auto-configuration (separate module since Boot 4) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-flyway</artifactId>
+        </dependency>
+
         <!-- Spring Security (JWT authentication; filter chain configured in Phase 4) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
