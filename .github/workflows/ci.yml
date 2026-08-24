@@ -125,42 +125,54 @@ jobs:
           # Wait for all services to become healthy (max 120s)
           TIMEOUT=120
           ELAPSED=0
+          SERVICES="mindq-mysql mindq-backend mindq-frontend"
           echo "Waiting for services to become healthy (timeout: ${TIMEOUT}s)..."
           while [ $ELAPSED -lt $TIMEOUT ]; do
-            HEALTHY_COUNT=$(docker compose ps --format "{{.Health}}" 2>/dev/null | grep -c "healthy" || true)
-            TOTAL=$(docker compose ps --format "{{.Health}}" 2>/dev/null | grep -c "" || true)
-            UNHEALTHY=$(docker compose ps --format "{{.Health}}" 2>/dev/null | grep -c "unhealthy" || true)
+            ALL_HEALTHY=true
+            ANY_UNHEALTHY=false
 
-            if [ "$UNHEALTHY" -gt 0 ]; then
+            for SVC in $SERVICES; do
+              STATUS=$(docker inspect --format="{{.State.Health.Status}}" "$SVC" 2>/dev/null || echo "missing")
+              if [ "$STATUS" = "unhealthy" ]; then
+                ANY_UNHEALTHY=true
+                break
+              fi
+              if [ "$STATUS" != "healthy" ]; then
+                ALL_HEALTHY=false
+              fi
+            done
+
+            if [ "$ANY_UNHEALTHY" = true ]; then
               echo "ERROR: A service is unhealthy after ${ELAPSED}s"
               docker compose ps
-              docker compose logs backend
-              docker compose logs mysql
+              docker compose logs --tail=50 backend
+              docker compose logs --tail=50 mysql
               docker compose down
               exit 1
             fi
 
-            if [ "$HEALTHY_COUNT" -ge 3 ] && [ "$TOTAL" -ge 3 ]; then
+            if [ "$ALL_HEALTHY" = true ]; then
               echo "All 3 services healthy after ${ELAPSED}s"
+              docker compose ps
               break
             fi
 
             sleep 5
             ELAPSED=$((ELAPSED + 5))
-            echo "  [${ELAPSED}s] ${HEALTHY_COUNT}/${TOTAL} services healthy..."
+            echo "  [${ELAPSED}s] waiting..."
           done
 
           if [ $ELAPSED -ge $TIMEOUT ]; then
             echo "ERROR: Timed out after ${TIMEOUT}s waiting for services"
             docker compose ps
-            docker compose logs backend
-            docker compose logs mysql
+            docker compose logs --tail=50 backend
+            docker compose logs --tail=50 mysql
             docker compose down
             exit 1
           fi
 
           # Verify endpoints respond
-          curl -f http://localhost:8080/api/v1/health || exit 1
-          curl -f http://localhost:80 || exit 1
+          curl -f http://localhost:8080/api/v1/health
+          curl -f http://localhost:80
 
           docker compose down
