@@ -69,9 +69,10 @@ app:
       max-tokens: ${GROQ_MAX_TOKENS:4096}
       temperature: ${GROQ_TEMPERATURE:0.7}
       max-material-chars: 80000
-  mail:
-    enabled: ${MAIL_ENABLED:false}
-    from: ${MAIL_FROM:MindQ <noreply@mindq.app>}
+  brevo:
+    api-key: ${BREVO_API_KEY:}
+    sender-email: ${BREVO_SENDER_EMAIL:noreply@mindq.app}
+    sender-name: ${BREVO_SENDER_NAME:MindQ}
   otp:
     enabled: ${OTP_ENABLED:false}
   payment:
@@ -79,18 +80,6 @@ app:
       key: ${RAZORPAY_KEY:rzp_test_placeholder}
       secret: ${RAZORPAY_SECRET:placeholder_secret}
       enabled: ${RAZORPAY_ENABLED:false}
-
-spring.mail:
-  host: ${MAIL_HOST:smtp.gmail.com}
-  port: ${MAIL_PORT:587}
-  username: ${MAIL_USERNAME:}
-  password: ${MAIL_PASSWORD:}
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
 
 springdoc:
   api-docs:

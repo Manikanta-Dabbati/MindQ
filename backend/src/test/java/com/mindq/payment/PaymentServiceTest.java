@@ -237,9 +237,11 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should return payment history for user")
-    void shouldReturnPaymentHistory() {
+    void shouldReturnPaymentHistory() throws InterruptedException {
         // Create two orders
         paymentService.createCheckoutOrder(testUser.getEmail(), "PRO", "MONTHLY");
+        // Ensure different timestamps (MySQL DATETIME has second-level precision)
+        Thread.sleep(1100);
         paymentService.createCheckoutOrder(testUser.getEmail(), "PRO", "YEARLY");
 
         List<PaymentTransaction> history = paymentService.getPaymentHistory(testUser.getEmail());

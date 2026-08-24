@@ -131,11 +131,7 @@
             <version>2.8.6</version>
         </dependency>
 
-        <!-- Spring Boot Mail: SMTP email delivery -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
+        <!-- Brevo HTTPS email delivery via java.net.http (no SDK needed) -->
 
         <!-- Spring Boot Testing -->
         <dependency>
