@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import OtpInput from "../../components/auth/OtpInput";
 import * as authService from "../../services/authService";
+import { getDevConfig, devAutoVerify } from "../../services/authService";
 import AuthMobileHeader from "../../components/auth/AuthMobileHeader";
 
 export default function VerifyEmail() {
@@ -16,6 +17,7 @@ export default function VerifyEmail() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [bypassActive, setBypassActive] = useState(false);
 
   const maskedEmail = email ? email.replace(/(.{2})(.*)(@.*)/, "$1***$3") : "***";
 
@@ -24,6 +26,38 @@ export default function VerifyEmail() {
     const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
     return () => clearTimeout(timer);
   }, [cooldown]);
+
+  // Dev OTP bypass: check config and auto-verify on mount
+  useEffect(() => {
+    if (!email) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const config = await getDevConfig();
+        if (cancelled) return;
+        if (config.bypassEnabled) {
+          setBypassActive(true);
+          setLoading(true);
+          try {
+            await devAutoVerify(email, "REGISTRATION");
+            if (!cancelled) {
+              setSuccess(true);
+              setTimeout(() => navigate("/login"), 2000);
+            }
+          } catch {
+            if (!cancelled) {
+              setBypassActive(false);
+            }
+          } finally {
+            if (!cancelled) setLoading(false);
+          }
+        }
+      } catch {
+        // Config endpoint failed -- bypass not available, proceed normally
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [email, navigate]);
 
   const handleVerify = useCallback(async () => {
     if (otp.length !== 6) return;
@@ -102,6 +136,11 @@ export default function VerifyEmail() {
             <p className="mt-2 text-sm leading-6 text-[var(--mq-text-secondary)]">We sent a verification code to <span className="font-medium text-[var(--mq-text)]">{maskedEmail}</span></p>
           </div>
 
+          {bypassActive && loading && (
+            <div className="mb-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+              Development bypass active -- verifying automatically...
+            </div>
+          )}
           {error && <div className="mb-5 rounded-xl border border-[var(--mq-error-border)] bg-[var(--mq-error-light)] px-4 py-3 text-sm text-[var(--mq-error)]">{error}</div>}
 
           <div className="space-y-6">

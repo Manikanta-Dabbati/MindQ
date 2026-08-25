@@ -69,6 +69,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/request-login-otp",
                                 "/api/v1/auth/verify-login-otp",
                                 "/api/v1/auth/resend-otp",
+                                "/api/v1/auth/dev/config",
+                                "/api/v1/auth/dev/auto-verify",
                                 "/api/v1/health",
                                 "/api/v1/health/live",
                                 "/api/v1/health/ready",

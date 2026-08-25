@@ -102,3 +102,23 @@ export async function verifyResetOtp(
   >("/auth/verify-reset-otp", { email, otpCode, purpose: "PASSWORD_RESET" });
   return response.data.data.resetToken;
 }
+
+// ── Development OTP bypass (temporary) ──────────────
+
+export async function getDevConfig(): Promise<{ bypassEnabled: boolean }> {
+  const response = await api.get<{ bypassEnabled: boolean; warning: string }>(
+    "/auth/dev/config",
+  );
+  return response.data;
+}
+
+export async function devAutoVerify(
+  email: string,
+  purpose: string,
+): Promise<Record<string, unknown>> {
+  const response = await api.post<Record<string, unknown>>(
+    "/auth/dev/auto-verify",
+    { email, purpose },
+  );
+  return response.data;
+}

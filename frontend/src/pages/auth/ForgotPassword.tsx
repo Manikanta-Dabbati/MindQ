@@ -2,6 +2,7 @@ import { Eye, EyeOff, KeyRound, Loader2, LockKeyhole, Mail, ShieldCheck } from "
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as authService from "../../services/authService";
+import { getDevConfig, devAutoVerify } from "../../services/authService";
 import OtpInput from "../../components/auth/OtpInput";
 import PasswordRequirements from "../../components/auth/PasswordRequirements";
 import AuthMobileHeader from "../../components/auth/AuthMobileHeader";
@@ -14,8 +15,16 @@ export default function ForgotPassword() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("email");
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [bypassActive, setBypassActive] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [email, setEmail] = useState("");
+
+  // Check dev OTP bypass config on mount
+  useEffect(() => {
+    getDevConfig()
+      .then((config) => setBypassActive(config.bypassEnabled))
+      .catch(() => {});
+  }, []);
   const [otp, setOtp] = useState("");
   const [resetToken, setResetToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -57,6 +66,16 @@ export default function ForgotPassword() {
     setError("");
     setLoading(true);
     try {
+      if (bypassActive) {
+        // Dev bypass: skip OTP and get reset token directly
+        const result = await devAutoVerify(email, "PASSWORD_RESET");
+        const data = result.data as { resetToken?: string } | undefined;
+        if (data?.resetToken) {
+          setResetToken(data.resetToken);
+          setStep("password");
+          return;
+        }
+      }
       await authService.forgotPassword(email);
       setStep("otp");
     } catch (err: unknown) {
@@ -209,6 +228,11 @@ export default function ForgotPassword() {
           {/* ── Step 1: Email ──────────────────────── */}
           {step === "email" && (
             <form className="space-y-5" onSubmit={handleSendOtp}>
+              {bypassActive && (
+                <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                  Development mode -- OTP will be bypassed automatically.
+                </div>
+              )}
               <div>
                 <label htmlFor="forgot-email" className="mb-2 block text-sm font-medium text-[var(--mq-text)]">
                   Email address

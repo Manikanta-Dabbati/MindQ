@@ -1,8 +1,9 @@
 import { ArrowRight, Brain, Eye, EyeOff, KeyRound, LockKeyhole, Mail, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import * as authService from "../../services/authService";
+import { getDevConfig, devAutoVerify } from "../../services/authService";
 import OtpInput from "../../components/auth/OtpInput";
 import AuthMobileHeader from "../../components/auth/AuthMobileHeader";
 
@@ -12,6 +13,7 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const resetSuccess = searchParams.get("reset") === "success";
   const [mode, setMode] = useState<LoginMode>("password");
+  const [bypassActive, setBypassActive] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +25,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login, loginWithOtp } = useAuth();
   const navigate = useNavigate();
+
+  // Check dev OTP bypass config on mount
+  useEffect(() => {
+    getDevConfig()
+      .then((config) => setBypassActive(config.bypassEnabled))
+      .catch(() => {});
+  }, []);
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +67,18 @@ export default function Login() {
     setError("");
     setOtpLoading(true);
     try {
+      // Dev bypass: auto-verify without sending OTP
+      if (bypassActive) {
+        const result = await devAutoVerify(email, "LOGIN");
+        // The response contains auth tokens
+        const data = result.data as { token: string; refreshToken: string; user: Record<string, unknown> } | undefined;
+        if (data?.token) {
+          localStorage.setItem("mindq_token", data.token);
+          localStorage.setItem("mindq_refresh_token", data.refreshToken);
+          navigate("/dashboard");
+          return;
+        }
+      }
       await authService.requestLoginOtp(email);
       setOtpSent(true);
       startCooldownTimer();
@@ -181,6 +202,11 @@ export default function Login() {
 
           {mode === "otp" && (
             <div className="space-y-5">
+              {bypassActive && (
+                <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                  Development mode -- OTP will be bypassed automatically.
+                </div>
+              )}
               <div>
                 <label htmlFor="otp-email" className="mb-2 block text-sm font-medium text-[var(--mq-text)]">Email address</label>
                 <div className="relative">

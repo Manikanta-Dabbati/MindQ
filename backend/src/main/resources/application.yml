@@ -89,6 +89,7 @@ app:
     from-name: ${MAIL_FROM_NAME:MindQ}
   otp:
     enabled: ${OTP_ENABLED:false}
+    bypass-enabled: ${OTP_BYPASS_ENABLED:false}
   payment:
     razorpay:
       key: ${RAZORPAY_KEY:rzp_test_placeholder}
